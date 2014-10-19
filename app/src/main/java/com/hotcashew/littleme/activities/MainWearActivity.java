@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.hotcashew.littleme.R;
@@ -14,16 +15,17 @@ import com.hotcashew.littleme.sensor.HeartRateSensorCallback;
 import java.text.SimpleDateFormat;
 
 public class MainWearActivity extends Activity implements HeartRateSensorCallback {
+    public static final int HEART_RATE_CHANGE = 10;
+
     private final SimpleDateFormat readableDateFormat = new SimpleDateFormat("kk:mm:ss:SSS");
 
-    public static final int HEART_RATE_JUMP = 10;
     private TextView sensorAccuracyView;
     private TextView sensorLastUpdateView;
     private TextView heartRateView;
 
-
     private final String TAG = MainWearActivity.class.getSimpleName();
     private HeartRateSensor heartRateSensor;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,7 @@ public class MainWearActivity extends Activity implements HeartRateSensorCallbac
                 sensorAccuracyView = (TextView) stub.findViewById(R.id.sensor_accuracy);
                 heartRateView = (TextView) stub.findViewById(R.id.sensor_heart_rate);
                 sensorLastUpdateView = (TextView) stub.findViewById(R.id.sensor_last_update);
+                progressBar = (ProgressBar) stub.findViewById(R.id.progress_bar);
             }
         });
 
@@ -75,11 +78,11 @@ public class MainWearActivity extends Activity implements HeartRateSensorCallbac
     }
 
     public void upHeartClick(View view) {
-        heartRateSensor.debugAddRate(HEART_RATE_JUMP);
+        heartRateSensor.debugAddRate(HEART_RATE_CHANGE);
     }
 
     public void downHeartClick(View view) {
-        heartRateSensor.debugSubRate(HEART_RATE_JUMP);
+        heartRateSensor.debugSubRate(HEART_RATE_CHANGE);
     }
 
     @Override
@@ -88,5 +91,18 @@ public class MainWearActivity extends Activity implements HeartRateSensorCallbac
         sensorLastUpdateView.setText(readableDateFormat.format(lastReading.lastTime));
         heartRateView.setText("" + lastReading.lastRate);
         sensorAccuracyView.setText("[acc " + reading.lastAccuracy + "]");
+
+        if(lastReading.lastRate > 100){
+            progressBar.incrementProgressBy(1);
+        }
+    }
+
+    public void stopClick(View view) {
+        progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    public void startClick(View view) {
+        progressBar.setProgress(0);
+        progressBar.setVisibility(View.VISIBLE);
     }
 }

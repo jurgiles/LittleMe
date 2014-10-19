@@ -37,11 +37,12 @@ public class HeartRateSensor implements SensorEventListener2 {
         callbacks.onSensorChanged(new HeartSensorReading(lastRate, (long) lastRate, lastAccuracy));
 
         Log.d(TAG, String.format("Heart readings: %s, additional: %s, total: %s", lastRate, additionalHeartRate, lastRate + additionalHeartRate));
+
+        lastRate += additionalHeartRate;
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
         lastAccuracy = accuracy;
         Log.d(TAG, "Sensor accuracy changed to " + accuracy);
     }

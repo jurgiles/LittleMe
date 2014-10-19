@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:keepScreenOn="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
-r
+    android:keepScreenOn="true">
+
     <com.hotcashew.littleme.CharacterView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
@@ -29,6 +27,7 @@ r
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/waiting"
+                android:textColor="@color/black"
                 tools:text="100" />
 
             <TextView
@@ -38,6 +37,7 @@ r
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:text="@string/waiting"
+                android:textColor="@color/black"
                 tools:text="[acc 2]" />
 
             <TextView
@@ -45,6 +45,7 @@ r
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/waiting"
+                android:textColor="@color/black"
                 tools:text="10:11:30.000" />
         </LinearLayout>
 
@@ -66,6 +67,36 @@ r
                 android:text="+" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="startClick"
+                android:text="Start" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="stopClick"
+                android:text="Stop" />
+        </LinearLayout>
+
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:layout_margin="10dp"
+        android:indeterminate="false"
+        android:visibility="invisible"
+        android:max="100" />
 
 </RelativeLayout>
