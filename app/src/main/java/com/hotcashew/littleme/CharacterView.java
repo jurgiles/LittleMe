@@ -5,10 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 public class CharacterView extends View {
@@ -26,6 +28,7 @@ public class CharacterView extends View {
     private float backgroundScrolling = 0;
     private Bitmap groundBitmap;
     private Bitmap treeBitmap;
+    private Paint testColor;
 
     public CharacterView(Context context) {
         super(context);
@@ -43,11 +46,20 @@ public class CharacterView extends View {
     }
 
     void initialize() {
-        runningSprite = BitmapFactory.decodeResource(getResources(), R.drawable.character_running);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inTargetDensity = 1;
+//        options.inDensity = 1;
+        options.inScaled = false;
+
+        runningSprite = BitmapFactory.decodeResource(getResources(), R.drawable.character_running, options);
+        groundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ground, options);
+        treeBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.tree, options);
+
         spriteDimensions = new Rect(0, 0, runningSprite.getWidth() / 8, runningSprite.getHeight() / 2);
 
-        groundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ground);
-        treeBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.tree);
+        testColor = new Paint();
+        testColor.setColor(0xEE22AA99);
+        testColor.setStrokeWidth(2.0f);
     }
 
     // tick forward the animation
@@ -64,47 +76,57 @@ public class CharacterView extends View {
         runCurrentFrameIdx = (int) Math.floor((float) runTotalFrames * (float) runProgressMsec / (float) runDurationMsec);
 //        Log.d("CharacterView", String.format("frame idx: %d (frame duration=%d msec | total=%d msec)", runCurrentFrameIdx, frameDuration, runProgressMsec));
 
-        backgroundScrolling = (backgroundScrolling + frameDuration) % 1024;
+        backgroundScrolling = (backgroundScrolling + (float) frameDuration / 2.0f) % 1024;
     }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         update();
 
-        float spriteDstScale = 0.5f;
-        Rect spriteSrc = new Rect(spriteDimensions.width() * runCurrentFrameIdx, 0, spriteDimensions.width() * runCurrentFrameIdx + spriteDimensions.width(), spriteDimensions.height());
-        RectF spriteDst = new RectF(0, 0, spriteDimensions.width() * spriteDstScale, spriteDimensions.height() * spriteDstScale);
+        Log.d("draw", String.format("canvas resolution: %d x %d", getWidth(), getHeight()));
 
         canvas.drawColor(Color.WHITE); // clear screen
+        canvas.scale((float) getWidth() / 320.0f, (float) getHeight() / 320.0f);
 
         drawBackground(canvas);
-        canvas.drawBitmap(runningSprite, spriteSrc, spriteDst, null); // draw sprite
+        drawCharacter(canvas);
 
         postInvalidate();
     }
 
+    private void drawCharacter(Canvas canvas) {
+        float spriteDstScale = 0.5f;
+        int characterX = 60;
+        Rect spriteSrc = new Rect(spriteDimensions.width() * runCurrentFrameIdx, 0, spriteDimensions.width() * runCurrentFrameIdx + spriteDimensions.width(), spriteDimensions.height());
+        RectF spriteDst = new RectF(characterX, 216 - spriteDimensions.height() * spriteDstScale, characterX + spriteDimensions.width() * spriteDstScale, 216);
+        canvas.drawBitmap(runningSprite, spriteSrc, spriteDst, null); // draw sprite
+    }
+
     private void drawBackground(Canvas canvas) {
+        // [0-1024]
+        int offsetLeft = (int) Math.floor(backgroundScrolling);
+        int screenWidth = 320;
+        int offsetTop = 216;
 
-        int backgroundOffset = (int) Math.floor(backgroundScrolling);
-        float backgroundScale = 320.0f / (float) groundBitmap.getWidth();
+        if (offsetLeft + screenWidth > 1024) {
+            // two-part draw
+            int right = Math.min(1024, offsetLeft + screenWidth);
+            int screenRemainder = right - offsetLeft;
+            Rect src = new Rect(offsetLeft, 0, right, 104); // in bitmap space
+            Rect dst = new Rect(0, offsetTop, screenRemainder, offsetTop + 104); // in screen space
+            canvas.drawBitmap(groundBitmap, src, dst, null);
 
-        int bg1x = backgroundOffset;
-        int bg2x = 0;
+            src = new Rect(0, 0, 320 - screenRemainder, 104); // in bitmap space
+            dst = new Rect(screenRemainder, offsetTop, 320, offsetTop + 104); // in screen space
+            canvas.drawBitmap(groundBitmap, src, dst, null);
 
-        int bg1w = groundBitmap.getWidth() - backgroundOffset;
-        int bg2w = backgroundOffset;
-
-        Rect bg1Src = new Rect(bg1x, 0, bg1w, groundBitmap.getHeight());
-        Rect bg1Dst = new Rect(0, 320 - (int) Math.floor(groundBitmap.getHeight() * backgroundScale), (int) Math.floor(bg1Src.width() * backgroundScale), 320);
-
-        Rect bg2Src = new Rect(bg2x, 0, bg2w, groundBitmap.getHeight());
-        Rect bg2Dst = new Rect((int) Math.floor(backgroundOffset * backgroundScale), 320 - (int) Math.floor(groundBitmap.getHeight() * backgroundScale), 320 - (int) Math.floor(bg2Src.width() * backgroundScale), 320);
-
-        //canvas.drawBitmap(groundBitmap, bg1Src, bg1Dst, null);
-
-        if (bg1x != 0) {
-            //canvas.drawBitmap(groundBitmap, bg2Src, bg2Dst, null);
+        } else {
+            // single draw
+            Rect src = new Rect(offsetLeft, 0, offsetLeft + screenWidth, 104); // in bitmap space
+            Rect dst = new Rect(0, offsetTop, screenWidth, offsetTop + 104); // in screen space
+            canvas.drawBitmap(groundBitmap, src, dst, null);
         }
     }
 }
