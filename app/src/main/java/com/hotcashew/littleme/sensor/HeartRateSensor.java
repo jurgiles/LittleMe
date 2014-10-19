@@ -12,6 +12,7 @@ import java.util.Date;
 public class HeartRateSensor implements SensorEventListener2 {
     private final String TAG = HeartRateSensor.class.getSimpleName();
     private final SensorManager sensorManager;
+    private Context context;
     private final HeartRateSensorCallback callbacks;
 
     private int additionalHeartRate = 0;
@@ -20,6 +21,7 @@ public class HeartRateSensor implements SensorEventListener2 {
     private long lastAccuracy = 0;
 
     public HeartRateSensor(Context context, HeartRateSensorCallback callbacks) {
+        this.context = context;
         this.callbacks = callbacks;
         sensorManager = ((SensorManager) context.getSystemService(Context.SENSOR_SERVICE));
     }
@@ -65,6 +67,12 @@ public class HeartRateSensor implements SensorEventListener2 {
 
     public void debugSubRate(int subtractRate) {
         additionalHeartRate -= subtractRate;
+    }
+
+    public void setMockRead(long value, long accuracy, long lastTime) {
+        this.lastRate = value;
+        this.lastAccuracy = accuracy;
+        this.lastRateTime = lastTime;
     }
 
     public static class HeartSensorReading {

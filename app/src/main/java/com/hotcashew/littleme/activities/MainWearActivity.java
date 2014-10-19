@@ -49,7 +49,6 @@ public class MainWearActivity extends Activity implements HeartRateSensorCallbac
         heartRateSensor = new HeartRateSensor(this, this);
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -96,7 +95,7 @@ public class MainWearActivity extends Activity implements HeartRateSensorCallbac
             progressBar.incrementProgressBy(1);
 
             if(progressBar.getProgress() >= 100){
-                Toast.makeText(this, "You do it!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "You did it!", Toast.LENGTH_SHORT).show();
                 progressBar.setVisibility(View.INVISIBLE);
             }
         }
