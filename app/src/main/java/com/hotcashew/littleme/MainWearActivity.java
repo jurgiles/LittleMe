@@ -16,7 +16,7 @@ import com.google.common.primitives.Floats;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class MainWearActivity extends Activity implements SensorEventListener2{
+public class MainWearActivity extends Activity implements SensorEventListener2 {
 
     private TextView sensorAccuracyView;
     private TextView sensorLastUpdateView;
@@ -41,7 +41,7 @@ public class MainWearActivity extends Activity implements SensorEventListener2{
             }
         });
 
-        sensorManager = ((SensorManager)getSystemService(SENSOR_SERVICE));
+        sensorManager = ((SensorManager) getSystemService(SENSOR_SERVICE));
     }
 
 
@@ -63,9 +63,9 @@ public class MainWearActivity extends Activity implements SensorEventListener2{
     public void onSensorChanged(SensorEvent event) {
         String heartReadings = TextUtils.join(", ", Floats.asList(event.values));
 
-        SimpleDateFormat readableDateFormat = new SimpleDateFormat("MMM dd,yyyy HH:mm");
+        SimpleDateFormat readableDateFormat = new SimpleDateFormat("k:m:s:SSS");
 
-        sensorLastUpdateView.setText(readableDateFormat.format(new Date()));
+        sensorLastUpdateView.setText(readableDateFormat.format(new Date().getTime()));
         heartRateView.setText(heartReadings);
 
         Log.d(TAG, "Heart readings: " + heartReadings);
@@ -73,7 +73,7 @@ public class MainWearActivity extends Activity implements SensorEventListener2{
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        sensorAccuracyView.setText("Sensor accuracy changed to " + accuracy);
+        sensorAccuracyView.setText("accuracy: " + accuracy);
 
         Log.d(TAG, "Sensor accuracy changed to " + accuracy);
     }
