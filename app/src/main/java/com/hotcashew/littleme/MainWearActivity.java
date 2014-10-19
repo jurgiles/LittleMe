@@ -50,8 +50,14 @@ public class MainWearActivity extends Activity implements SensorEventListener2 {
         super.onStart();
 
         Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
-
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        sensorManager.unregisterListener(this);
     }
 
     @Override
@@ -77,6 +83,4 @@ public class MainWearActivity extends Activity implements SensorEventListener2 {
 
         Log.d(TAG, "Sensor accuracy changed to " + accuracy);
     }
-
-
 }
