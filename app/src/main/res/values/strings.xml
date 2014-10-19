@@ -3,6 +3,6 @@
 
     <string name="app_name">LittleMe</string>
     <string name="hello_round">Hello Round World!</string>
-    <string name="hello_square">Hello Square World!</string>
+    <string name="waiting">waiting...</string>
 
 </resources>
