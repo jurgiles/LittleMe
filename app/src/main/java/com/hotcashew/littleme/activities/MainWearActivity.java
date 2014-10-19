@@ -87,12 +87,11 @@ public class MainWearActivity extends Activity implements HeartRateSensorCallbac
 
     @Override
     public void onSensorChanged(HeartRateSensor.HeartSensorReading reading) {
-        HeartRateSensor.HeartSensorReading lastReading = heartRateSensor.getLastReading();
-        sensorLastUpdateView.setText(readableDateFormat.format(lastReading.lastTime));
-        heartRateView.setText("" + lastReading.lastRate);
+        sensorLastUpdateView.setText(readableDateFormat.format(reading.lastTime));
+        heartRateView.setText("" + reading.lastRate);
         sensorAccuracyView.setText("[acc " + reading.lastAccuracy + "]");
 
-        if(lastReading.lastRate > 100){
+        if(reading.lastRate > 100){
             progressBar.incrementProgressBy(1);
         }
     }

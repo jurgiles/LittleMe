@@ -34,11 +34,9 @@ public class HeartRateSensor implements SensorEventListener2 {
         lastRate = event.values[0];
         lastRateTime = new Date().getTime();
 
-        callbacks.onSensorChanged(new HeartSensorReading(lastRate, (long) lastRate, lastAccuracy));
+        callbacks.onSensorChanged(getLastReading());
 
         Log.d(TAG, String.format("Heart readings: %s, additional: %s, total: %s", lastRate, additionalHeartRate, lastRate + additionalHeartRate));
-
-        lastRate += additionalHeartRate;
     }
 
     @Override
@@ -58,7 +56,7 @@ public class HeartRateSensor implements SensorEventListener2 {
     }
 
     public HeartSensorReading getLastReading() {
-        return new HeartSensorReading(lastRate, lastRateTime, lastAccuracy);
+        return new HeartSensorReading(lastRate + additionalHeartRate, lastRateTime, lastAccuracy);
     }
 
     public void debugAddRate(int additionalRate) {
