@@ -10,8 +10,8 @@ import android.util.Log;
 import java.util.Date;
 
 public class HeartRateSensor implements SensorEventListener2 {
-    private final SensorManager sensorManager;
     private final String TAG = HeartRateSensor.class.getSimpleName();
+    private final SensorManager sensorManager;
     private final HeartRateSensorCallback callbacks;
 
     private int additionalHeartRate = 0;

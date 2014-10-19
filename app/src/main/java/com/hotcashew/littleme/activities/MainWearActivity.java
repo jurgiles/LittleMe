@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hotcashew.littleme.R;
 import com.hotcashew.littleme.sensor.HeartRateSensor;
@@ -93,6 +94,11 @@ public class MainWearActivity extends Activity implements HeartRateSensorCallbac
 
         if(reading.lastRate > 100){
             progressBar.incrementProgressBy(1);
+
+            if(progressBar.getProgress() >= 100){
+                Toast.makeText(this, "You do it!", Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
