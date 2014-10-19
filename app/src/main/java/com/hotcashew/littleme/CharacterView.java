@@ -5,12 +5,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.SystemClock;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 public class CharacterView extends View {
@@ -28,7 +26,6 @@ public class CharacterView extends View {
     private float backgroundScrolling = 0;
     private Bitmap groundBitmap;
     private Bitmap treeBitmap;
-    private Paint testColor;
 
     public CharacterView(Context context) {
         super(context);
@@ -48,7 +45,6 @@ public class CharacterView extends View {
     void initialize() {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inTargetDensity = 1;
-//        options.inDensity = 1;
         options.inScaled = false;
 
         runningSprite = BitmapFactory.decodeResource(getResources(), R.drawable.character_running, options);
@@ -56,10 +52,6 @@ public class CharacterView extends View {
         treeBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.tree, options);
 
         spriteDimensions = new Rect(0, 0, runningSprite.getWidth() / 8, runningSprite.getHeight() / 2);
-
-        testColor = new Paint();
-        testColor.setColor(0xEE22AA99);
-        testColor.setStrokeWidth(2.0f);
     }
 
     // tick forward the animation
@@ -85,8 +77,6 @@ public class CharacterView extends View {
         super.onDraw(canvas);
         update();
 
-        Log.d("draw", String.format("canvas resolution: %d x %d", getWidth(), getHeight()));
-
         canvas.drawColor(Color.WHITE); // clear screen
         canvas.scale((float) getWidth() / 320.0f, (float) getHeight() / 320.0f);
 
@@ -101,7 +91,7 @@ public class CharacterView extends View {
         int characterX = 60;
         Rect spriteSrc = new Rect(spriteDimensions.width() * runCurrentFrameIdx, 0, spriteDimensions.width() * runCurrentFrameIdx + spriteDimensions.width(), spriteDimensions.height());
         RectF spriteDst = new RectF(characterX, 216 - spriteDimensions.height() * spriteDstScale, characterX + spriteDimensions.width() * spriteDstScale, 216);
-        canvas.drawBitmap(runningSprite, spriteSrc, spriteDst, null); // draw sprite
+        canvas.drawBitmap(runningSprite, spriteSrc, spriteDst, null);
     }
 
     private void drawBackground(Canvas canvas) {
