@@ -8,10 +8,11 @@ android {
     defaultConfig {
         applicationId "com.hotcashew.littleme"
         minSdkVersion 20
-        targetSdkVersion 21
+        targetSdkVersion 20
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
             runProguard false
