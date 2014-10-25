@@ -1,32 +1,28 @@
 package com.hotcashew.littleme.activities;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.hotcashew.littleme.R;
-import com.hotcashew.littleme.sensor.HeartRateSensor;
-import com.hotcashew.littleme.sensor.HeartRateSensorCallback;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
-public class MainWearActivity extends Activity implements HeartRateSensorCallback {
-    public static final int HEART_RATE_CHANGE = 10;
+public class MainWearActivity extends Activity {
+    private final String TIME_FORMAT_DISPLAYED = "kk:mm a";
 
-    private final SimpleDateFormat readableDateFormat = new SimpleDateFormat("kk:mm:ss:SSS");
-
-    private TextView sensorAccuracyView;
-    private TextView sensorLastUpdateView;
-    private TextView heartRateView;
+    private TextView batteryView;
+    private TextView timeView;
 
     private final String TAG = MainWearActivity.class.getSimpleName();
-    private HeartRateSensor heartRateSensor;
-    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,74 +35,48 @@ public class MainWearActivity extends Activity implements HeartRateSensorCallbac
 
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
-                sensorAccuracyView = (TextView) stub.findViewById(R.id.sensor_accuracy);
-                heartRateView = (TextView) stub.findViewById(R.id.sensor_heart_rate);
-                sensorLastUpdateView = (TextView) stub.findViewById(R.id.sensor_last_update);
-                progressBar = (ProgressBar) stub.findViewById(R.id.progress_bar);
+                batteryView = (TextView) stub.findViewById(R.id.watch_battery);
+                timeView = (TextView) stub.findViewById(R.id.watch_time);
+
+                mTimeInfoReceiver.onReceive(MainWearActivity.this, registerReceiver(null, INTENT_FILTER));
+
+                registerReceiver(mTimeInfoReceiver, INTENT_FILTER);
+
+                registerReceiver(mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+
             }
         });
-
-        heartRateSensor = new HeartRateSensor(this, this);
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d(TAG, "onStart");
-
-        heartRateSensor.onStart();
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mTimeInfoReceiver);
+        unregisterReceiver(mBatInfoReceiver);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStop");
-
-        heartRateSensor.onStop();
+    private final static IntentFilter INTENT_FILTER;
+    static {
+        INTENT_FILTER = new IntentFilter();
+        INTENT_FILTER.addAction(Intent.ACTION_TIME_TICK);
+        INTENT_FILTER.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+        INTENT_FILTER.addAction(Intent.ACTION_TIME_CHANGED);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "onPause");
-    }
-
-    public void upHeartClick(View view) {
-        heartRateSensor.debugAddRate(HEART_RATE_CHANGE);
-    }
-
-    public void downHeartClick(View view) {
-        heartRateSensor.debugSubRate(HEART_RATE_CHANGE);
-    }
-
-    @Override
-    public void onSensorChanged(HeartRateSensor.HeartSensorReading reading) {
-        sensorLastUpdateView.setText(readableDateFormat.format(reading.lastTime));
-        heartRateView.setText("" + reading.lastRate);
-        sensorAccuracyView.setText("[acc " + reading.lastAccuracy + "]");
-
-        if(reading.lastRate > 100){
-            progressBar.incrementProgressBy(1);
-
-            if(progressBar.getProgress() >= 100){
-                Toast.makeText(this, "You did it!", Toast.LENGTH_SHORT).show();
-                progressBar.setVisibility(View.INVISIBLE);
-            }
+    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver(){
+        @Override
+        public void onReceive(Context arg0, Intent intent) {
+            batteryView.setText(String.valueOf(intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0) + "%"));
         }
-    }
+    };
 
-    public void stopClick(View view) {
-        progressBar.setVisibility(View.INVISIBLE);
-    }
+    private BroadcastReceiver mTimeInfoReceiver = new BroadcastReceiver(){
+        @Override
+        public void onReceive(Context arg0, Intent intent) {
+            timeView.setText(
+                    new SimpleDateFormat(TIME_FORMAT_DISPLAYED)
+                            .format(Calendar.getInstance().getTime()));
+        }
+    };
 
-    public void startClick(View view) {
-        progressBar.setProgress(0);
-        progressBar.setVisibility(View.VISIBLE);
-    }
 }
